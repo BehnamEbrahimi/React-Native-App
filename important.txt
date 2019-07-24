@@ -1,0 +1,18 @@
+for react-native-maps:
+in node_modules\react-native-maps\lib\android\src\main\java\com\airbnb\android\react\maps\AirMapView.java
+update on AirmapView.java:
+import android.support.v4.view.GestureDetectorCompat; --> import androidx.core.view.GestureDetectorCompat;
+import android.support.v4.view.MotionEventCompat; --> import androidx.core.view.MotionEventCompat;
+...
+import static android.support.v4.content.PermissionChecker.checkSelfPermission; --> import static androidx.core.content.PermissionChecker.checkSelfPermission;
+-----------------------------------
+To solve Manifest merger failed error:
+
+open file gradle.properties and add these two lines to it:
+
+android.useAndroidX = true
+android.enableJetifier = true
+
+clean and build
+-----------------------------------
+"react-native-navigation": "3.0.0-alpha.6" ---> "react-native-navigation": "3.0.0-alpha.3"
