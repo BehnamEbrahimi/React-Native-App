@@ -1,17 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Button, StyleSheet, ScrollView } from 'react-native';
+import Joi from 'joi-browser';
 
 import { connect } from 'react-redux';
 import { addPlace } from '../../store/actions';
 
+import validate from '../utils/validate';
+
 import HeadingText from '../components/common/HeadingText';
 import MainText from '../components/common/MainText';
+import Input from '../components/common/Input';
 import PickImage from '../components/PickImage';
 import PickLocation from '../components/PickLocation';
-import PlaceInput from '../components/PlaceInput';
 
 const SharePlace = ({ addPlace }) => {
-  const [placeName, setPlaceName] = useState('');
+  const [formData, setFormData] = useState({
+    placeName: '',
+    locationChosen: false,
+    imageChosen: false
+  });
+  const [coords, setCoords] = useState({
+    latitude: -33.845499,
+    longitude: 151.072297
+  });
+  const [placeImage, setPlaceImage] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({
+    placeName: false
+  });
+
+  const { placeName } = formData;
+
+  const schema = {
+    placeName: Joi.string()
+      .min(1)
+      .required(),
+    locationChosen: Joi.boolean().invalid(false),
+    imageChosen: Joi.boolean().invalid(false)
+  };
+
+  useEffect(() => {
+    const errors = validate(formData, schema);
+    setErrors(errors || {});
+  }, [formData]);
+
+  const handleChange = name => val => {
+    setFormData({ ...formData, [name]: val });
+    setTouched({ ...touched, [name]: true });
+  };
 
   const { container, button } = styles;
 
@@ -21,19 +57,41 @@ const SharePlace = ({ addPlace }) => {
         <MainText>
           <HeadingText>Share a Place with us!</HeadingText>
         </MainText>
-        <PickImage />
-        <PickLocation />
-        <PlaceInput
-          placeName={placeName}
-          onChangeText={val => setPlaceName(val)}
+        <PickImage
+          image={placeImage}
+          updateImage={image => {
+            setPlaceImage(image);
+            setFormData({ ...formData, imageChosen: true });
+          }}
+        />
+        <PickLocation
+          coords={coords}
+          updateCoords={coords => {
+            setCoords(coords);
+            setFormData({ ...formData, locationChosen: true });
+          }}
+        />
+        <Input
+          placeholder="Share the place!"
+          value={placeName}
+          onChangeText={handleChange('placeName')}
+          valid={errors['placeName'] ? false : true}
+          touched={touched['placeName']}
         />
         <Button
           title="Share the place!"
           style={button}
           onPress={() => {
-            addPlace(placeName);
-            setPlaceName('');
+            addPlace(placeName, coords, placeImage);
+            setFormData({
+              placeName: '',
+              locationChosen: false,
+              imageChosen: false
+            });
+            setTouched({ placeName: false });
+            setErrors({});
           }}
+          disabled={Object.entries(errors).length !== 0}
         />
       </View>
     </ScrollView>

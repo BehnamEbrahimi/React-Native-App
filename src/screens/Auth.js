@@ -15,6 +15,8 @@ import { auth } from '../../store/actions';
 
 import { startMainTabs } from '../navigations';
 
+import validate from '../utils/validate';
+
 import Input from '../components/common/Input';
 import HeadingText from '../components/common/HeadingText';
 import MainText from '../components/common/MainText';
@@ -50,12 +52,11 @@ const Auth = ({ auth }) => {
 
   const { email, password, confirmPassword } = formData;
 
-  schema = {
-    email: Joi.string()
-      .required()
-      .email(),
+  const schema = {
+    email: Joi.string().required(),
+    //.email(), // remove // for launch
     password: Joi.string()
-      .min(6)
+      .min(2) // change it back to 6
       .max(12)
       .required(),
     confirmPassword: Joi.any()
@@ -64,22 +65,8 @@ const Auth = ({ auth }) => {
       .options({ language: { any: { allowOnly: 'must match password' } } })
   };
 
-  const validate = () => {
-    const { error } = Joi.validate(formData, schema, { abortEarly: false });
-    if (!error) return null;
-    const errors = {};
-    for (let item of error.details) {
-      if (errors[item.path[0]]) {
-        errors[item.path[0]].push(item.message);
-      } else {
-        errors[item.path[0]] = [item.message];
-      }
-    }
-    return errors;
-  };
-
   useEffect(() => {
-    const errors = validate();
+    const errors = validate(formData, schema);
     if (authMode === 'login') {
       delete errors.confirmPassword;
     }

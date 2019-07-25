@@ -1,14 +1,12 @@
 // Add Place
-export const addPlace = placeName => dispatch => {
+export const addPlace = (placeName, coords, placeImage) => dispatch => {
   if (placeName.trim() === '') return;
 
   const newPlace = {
     key: Math.random().toString(),
     placeName,
-    placeImage: {
-      uri:
-        'https://image.shutterstock.com/image-vector/cute-smiling-welsh-corgi-dog-260nw-1014458896.jpg'
-    }
+    coords,
+    placeImage
   };
 
   dispatch({ type: 'ADD_PLACE', payload: newPlace });

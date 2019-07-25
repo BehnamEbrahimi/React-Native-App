@@ -1,22 +1,46 @@
-import React, { Fragment } from 'react';
-import { Text, View, Button, StyleSheet } from 'react-native';
+import React from 'react';
+import { Image, View, Button, StyleSheet } from 'react-native';
+import ImagePicker from 'react-native-image-picker';
 
-const PickImage = () => {
-  const { placeholder, button } = styles;
+const PickImage = ({ image, updateImage }) => {
+  const { placeholder, button, container, preview } = styles;
+
+  const browseImage = () => {
+    ImagePicker.showImagePicker({ title: 'Pick an image.' }, res => {
+      if (res.didCancel) {
+        console.log('User cancelled.');
+      } else if (res.error) {
+        console.log('Error', res.error);
+      } else {
+        updateImage({
+          uri: res.uri,
+          base64: res.data
+        });
+      }
+    });
+  };
 
   return (
-    <Fragment>
+    <View style={container}>
       <View style={placeholder}>
-        <Text>Image Preview!</Text>
+        <Image source={image} style={preview} />
       </View>
       <View style={button}>
-        <Button title="Pick Image" />
+        <Button title="Pick Image" onPress={browseImage} />
       </View>
-    </Fragment>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    alignItems: 'center'
+  },
+  preview: {
+    width: '100%',
+    height: '100%'
+  },
   placeholder: {
     borderColor: 'black',
     borderWidth: 1,
