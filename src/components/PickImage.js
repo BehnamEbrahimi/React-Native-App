@@ -14,7 +14,8 @@ const PickImage = ({ image, updateImage }) => {
       } else {
         updateImage({
           uri: res.uri,
-          base64: res.data
+          data: res.data,
+          contentType: 'image/jpeg'
         });
       }
     });

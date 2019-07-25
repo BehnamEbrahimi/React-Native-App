@@ -10,20 +10,20 @@ const validateObjectId = require('../../middleware/validateObjectId');
 // @desc    Create a place
 // @access  Private
 router.post('/', [auth, validate(validatePlace)], async (req, res) => {
-  const user = await User.findById(req.user._id).select('-password');
+  //const user = await User.findById(req.user._id).select('-password');
 
   const newPlace = new Place({
-    user: req.user._id,
+    //user: req.user._id,
     placeName: req.body.placeName,
     placeImage: {
       data: Buffer.from(req.body.placeImage.data, 'base64'),
       contentType: 'image/jpeg'
     },
     coords: {
-      latitude: req.body.latitude,
-      longtitude: req.body.longtitude
-    },
-    email: user.email
+      latitude: req.body.coords.latitude,
+      longitude: req.body.coords.longitude
+    }
+    //email: user.email
   });
 
   await newPlace.save();
@@ -32,7 +32,7 @@ router.post('/', [auth, validate(validatePlace)], async (req, res) => {
   //res.contentType('image/jpeg');
   //res.end(newPlace.placeImage.data, 'binary');
 
-  res.send('Place saved to the DB.');
+  res.send(newPlace);
 });
 
 // @route   GET api/places

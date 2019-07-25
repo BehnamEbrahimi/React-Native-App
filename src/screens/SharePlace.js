@@ -82,7 +82,7 @@ const SharePlace = ({ addPlace }) => {
           title="Share the place!"
           style={button}
           onPress={() => {
-            addPlace(placeName, coords, placeImage);
+            addPlace(placeName, placeImage, coords);
             setFormData({
               placeName: '',
               locationChosen: false,

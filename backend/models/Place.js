@@ -22,7 +22,7 @@ const placeSchema = new mongoose.Schema({
   },
   coords: {
     latitude: { type: Number, required: true },
-    longtitude: { type: Number, required: true }
+    longitude: { type: Number, required: true }
   },
   email: {
     type: String
@@ -47,13 +47,17 @@ function validatePlace(place) {
         contentType: Joi.string().required()
       })
       .required(),
-    latitude: Joi.number()
-      .min(-85)
-      .max(85)
-      .required(),
-    longtitude: Joi.number()
-      .min(-180)
-      .max(180)
+    coords: Joi.object()
+      .keys({
+        latitude: Joi.number()
+          .min(-85)
+          .max(85)
+          .required(),
+        longitude: Joi.number()
+          .min(-180)
+          .max(180)
+          .required()
+      })
       .required()
   };
 
