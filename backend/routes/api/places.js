@@ -28,11 +28,28 @@ router.post('/', [auth, validate(validatePlace)], async (req, res) => {
 
   await newPlace.save();
 
-  // to respond with image
-  //res.contentType('image/jpeg');
-  //res.end(newPlace.placeImage.data, 'binary');
+  const place = {
+    key: newPlace._id,
+    placeName: newPlace.placeName,
+    coords: newPlace.coords,
+    placeImage: { uri: `http://10.0.2.2:5000/api/places/image/${newPlace._id}` }
+  };
 
-  res.send(newPlace);
+  res.send(place);
+});
+
+// @route   GET api/places/image/:id
+// @desc    Get place's image by id
+// @access  Private
+router.get('/image/:id', [auth, validateObjectId], async (req, res) => {
+  const place = await Place.findById(req.params.id);
+
+  if (!place) {
+    return res.status(404).send('Place not found.');
+  }
+
+  res.contentType('image/jpeg');
+  res.end(place.placeImage.data, 'binary');
 });
 
 // @route   GET api/places
@@ -40,20 +57,15 @@ router.post('/', [auth, validate(validatePlace)], async (req, res) => {
 // @access  Private
 router.get('/', auth, async (req, res) => {
   const places = await Place.find().sort({ date: -1 });
-  res.send(places);
-});
 
-// @route   GET api/places/:id
-// @desc    Get one place by Id
-// @access  Private
-router.get('/:id', [auth, validateObjectId], async (req, res) => {
-  const place = await Place.findById(req.params.id);
-
-  if (!place) {
-    return res.status(404).send('Place not found.');
-  }
-
-  res.send(place);
+  res.send(
+    places.map(place => ({
+      key: place._id,
+      placeName: place.placeName,
+      coords: place.coords,
+      placeImage: { uri: `http://10.0.2.2:5000/api/places/image/${place._id}` }
+    }))
+  );
 });
 
 // @route   DELETE api/places/:id
@@ -67,9 +79,9 @@ router.delete('/:id', [auth, validateObjectId], async (req, res) => {
   }
 
   // Check place
-  if (place.user.toString() !== req.user._id) {
-    return res.status(403).send('Forbidden action.');
-  }
+  //if (place.user.toString() !== req.user._id) {
+  //  return res.status(403).send('Forbidden action.');
+  //}
 
   await place.remove();
 

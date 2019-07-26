@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Button,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator
+} from 'react-native';
 import Joi from 'joi-browser';
 
 import { connect } from 'react-redux';
@@ -13,7 +19,7 @@ import Input from '../components/common/Input';
 import PickImage from '../components/PickImage';
 import PickLocation from '../components/PickLocation';
 
-const SharePlace = ({ addPlace }) => {
+const SharePlace = ({ addPlace, isLoading }) => {
   const [formData, setFormData] = useState({
     placeName: '',
     locationChosen: false,
@@ -78,21 +84,25 @@ const SharePlace = ({ addPlace }) => {
           valid={errors['placeName'] ? false : true}
           touched={touched['placeName']}
         />
-        <Button
-          title="Share the place!"
-          style={button}
-          onPress={() => {
-            addPlace(placeName, placeImage, coords);
-            setFormData({
-              placeName: '',
-              locationChosen: false,
-              imageChosen: false
-            });
-            setTouched({ placeName: false });
-            setErrors({});
-          }}
-          disabled={Object.entries(errors).length !== 0}
-        />
+        {isLoading ? (
+          <ActivityIndicator />
+        ) : (
+          <Button
+            title="Share the place!"
+            style={button}
+            onPress={() => {
+              addPlace(placeName, placeImage, coords);
+              setFormData({
+                placeName: '',
+                locationChosen: false,
+                imageChosen: false
+              });
+              setTouched({ placeName: false });
+              setErrors({});
+            }}
+            disabled={Object.entries(errors).length !== 0}
+          />
+        )}
       </View>
     </ScrollView>
   );
@@ -110,7 +120,11 @@ const styles = StyleSheet.create({
   }
 });
 
+const mapStateToProps = state => {
+  return { isLoading: state.isLoading };
+};
+
 export default connect(
-  null,
+  mapStateToProps,
   { addPlace }
 )(SharePlace);

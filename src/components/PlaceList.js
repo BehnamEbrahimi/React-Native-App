@@ -11,6 +11,7 @@ const PlaceList = ({ places }) => (
     data={places}
     renderItem={info => (
       <ListItem
+        key={info.item.key}
         placeName={info.item.placeName}
         placeImage={info.item.placeImage}
         handleItemSelect={() =>

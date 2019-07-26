@@ -7,10 +7,13 @@ import {
   Animated
 } from 'react-native';
 
+import { connect } from 'react-redux';
+import { getPlaces } from '../../store/actions';
+
 import PlaceList from '../components/PlaceList';
 
-const FindPlace = () => {
-  const [loading, setLoading] = useState(true);
+const FindPlace = ({ getPlaces }) => {
+  const [btnShowing, setBtnShowing] = useState(true);
   const { searchBtn, searchBtnText, btnContainer } = styles;
 
   // Expand Fade Out Animation
@@ -52,8 +55,9 @@ const FindPlace = () => {
   };
 
   const handleSearch = async () => {
+    getPlaces();
     await expandFadeOut();
-    setLoading(false);
+    setBtnShowing(false);
     await fadeIn();
   };
 
@@ -67,7 +71,7 @@ const FindPlace = () => {
     </Animated.View>
   );
 
-  if (!loading) {
+  if (!btnShowing) {
     content = (
       <Animated.View style={fadeInStyle}>
         <PlaceList />
@@ -75,7 +79,7 @@ const FindPlace = () => {
     );
   }
 
-  return <View style={loading && btnContainer}>{content}</View>;
+  return <View style={btnShowing ? btnContainer : null}>{content}</View>;
 };
 
 const styles = StyleSheet.create({
@@ -97,4 +101,7 @@ const styles = StyleSheet.create({
   }
 });
 
-export default FindPlace;
+export default connect(
+  null,
+  { getPlaces }
+)(FindPlace);
