@@ -11,7 +11,10 @@ if (__DEV__) {
   composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 }
 
-const store = createStore(reducers, composeEnhancers(applyMiddleware(thunk)));
+export const store = createStore(
+  reducers,
+  composeEnhancers(applyMiddleware(thunk))
+);
 
 export function registerScreens() {
   Navigation.registerComponentWithRedux(
@@ -38,8 +41,10 @@ export function registerScreens() {
     Provider,
     store
   );
-  Navigation.registerComponent(
+  Navigation.registerComponentWithRedux(
     'SideMenu',
-    () => require('./screens/SideMenu').default
+    () => require('./screens/SideMenu').default,
+    Provider,
+    store
   );
 }

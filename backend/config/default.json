@@ -1,5 +1,6 @@
 {
   "mongoURI": "mongodb+srv://behnam:m1005m@rn-8gbe5.mongodb.net/rn?retryWrites=true&w=majority",
   "jwtSecret": "unsecureKey",
-  "requiresAuth": false
+  "requiresAuth": true,
+  "serverURL": "http://10.0.2.2:5000"
 }

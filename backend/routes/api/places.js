@@ -1,19 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../../models/User');
+const config = require('config');
 const { Place, validatePlace } = require('../../models/Place');
 const validate = require('../../middleware/validate');
 const auth = require('../../middleware/auth');
 const validateObjectId = require('../../middleware/validateObjectId');
 
+const serverURL = config.get('serverURL');
+
 // @route   POST api/places
 // @desc    Create a place
 // @access  Private
 router.post('/', [auth, validate(validatePlace)], async (req, res) => {
-  //const user = await User.findById(req.user._id).select('-password');
-
   const newPlace = new Place({
-    //user: req.user._id,
+    owner: req.user._id,
     placeName: req.body.placeName,
     placeImage: {
       data: Buffer.from(req.body.placeImage.data, 'base64'),
@@ -23,17 +23,21 @@ router.post('/', [auth, validate(validatePlace)], async (req, res) => {
       latitude: req.body.coords.latitude,
       longitude: req.body.coords.longitude
     }
-    //email: user.email
   });
 
   await newPlace.save();
 
   const place = {
     key: newPlace._id,
+    owner: newPlace.owner,
     placeName: newPlace.placeName,
     coords: newPlace.coords,
-    placeImage: { uri: `http://10.0.2.2:5000/api/places/image/${newPlace._id}` }
+    placeImage: {
+      uri: `${serverURL}/api/places/image/${newPlace._id}`,
+      headers: {}
+    }
   };
+  place.placeImage.headers['x-auth-token'] = req.header('x-auth-token');
 
   res.send(place);
 });
@@ -58,14 +62,21 @@ router.get('/image/:id', [auth, validateObjectId], async (req, res) => {
 router.get('/', auth, async (req, res) => {
   const places = await Place.find().sort({ date: -1 });
 
-  res.send(
-    places.map(place => ({
-      key: place._id,
-      placeName: place.placeName,
-      coords: place.coords,
-      placeImage: { uri: `http://10.0.2.2:5000/api/places/image/${place._id}` }
-    }))
-  );
+  toBeSent = places.map(place => ({
+    key: place._id,
+    owner: place.owner,
+    placeName: place.placeName,
+    coords: place.coords,
+    placeImage: {
+      uri: `${serverURL}/api/places/image/${place._id}`,
+      headers: {}
+    }
+  }));
+  toBeSent.forEach(place => {
+    place.placeImage.headers['x-auth-token'] = req.header('x-auth-token');
+  });
+
+  res.send(toBeSent);
 });
 
 // @route   DELETE api/places/:id
@@ -79,9 +90,9 @@ router.delete('/:id', [auth, validateObjectId], async (req, res) => {
   }
 
   // Check place
-  //if (place.user.toString() !== req.user._id) {
-  //  return res.status(403).send('Forbidden action.');
-  //}
+  if (place.owner.toString() !== req.user._id) {
+    return res.status(403).send('Forbidden action.');
+  }
 
   await place.remove();
 

@@ -1,41 +1,11 @@
-import { Navigation } from 'react-native-navigation';
-import { registerScreens } from './src/screens';
+import { registerScreens, store } from './src/screens';
+import { registerNavEvents } from './src/navEvents';
+import { loadUser } from './store/actions';
+
+store.dispatch(loadUser());
 
 // Register Screens
 registerScreens();
 
-Navigation.events().registerNavigationButtonPressedListener(({ buttonId }) => {
-  if (buttonId === 'sideMenuBtn') {
-    Navigation.mergeOptions('SideMenuId', {
-      sideMenu: {
-        left: {
-          visible: true
-        }
-      }
-    });
-  }
-});
-
-// Start App
-Navigation.events().registerAppLaunchedListener(() => {
-  Navigation.setRoot({
-    root: {
-      stack: {
-        children: [
-          {
-            component: {
-              name: 'Auth'
-            }
-          }
-        ],
-        options: {
-          topBar: {
-            title: {
-              text: 'Login'
-            }
-          }
-        }
-      }
-    }
-  });
-});
+// Register Navigation Events
+registerNavEvents();

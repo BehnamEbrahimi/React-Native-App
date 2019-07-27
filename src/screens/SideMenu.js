@@ -8,12 +8,21 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const SideMenu = () => {
+import { connect } from 'react-redux';
+import { logout } from '../../store/actions';
+
+import { loginPage } from '../navigations';
+
+const SideMenu = ({ logout }) => {
   const { container, drawerItem, drawerItemIcon } = styles;
 
   return (
     <View style={container}>
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          logout();
+          loginPage();
+        }}>
         <View style={drawerItem}>
           <Icon
             name={Platform.OS === 'android' ? 'md-log-out' : 'ios-log-out'}
@@ -46,4 +55,7 @@ const styles = StyleSheet.create({
   }
 });
 
-export default SideMenu;
+export default connect(
+  null,
+  { logout }
+)(SideMenu);

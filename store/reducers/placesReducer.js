@@ -8,6 +8,8 @@ export default function(state = [], action) {
       return [...payload];
     case 'REMOVE_PLACE':
       return state.filter(place => place.key !== payload);
+    case 'CLEAR_PLACES':
+      return [];
     default:
       return [...state];
   }

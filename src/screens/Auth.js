@@ -11,7 +11,7 @@ import {
 import Joi from 'joi-browser';
 
 import { connect } from 'react-redux';
-import { auth } from '../../store/actions';
+import { login, register } from '../../store/actions';
 
 import { startMainTabs } from '../navigations';
 
@@ -23,7 +23,7 @@ import MainText from '../components/common/MainText';
 import DefaultButton from '../components/common/DefaultButton';
 import backgroundImage from '../img/background.jpg';
 
-const Auth = ({ auth }) => {
+const Auth = ({ login, register, isAuthenticated }) => {
   useEffect(() => {
     const updateStyle = newDims => {
       if (newDims.window.height > 500) setIsLong(true);
@@ -53,10 +53,11 @@ const Auth = ({ auth }) => {
   const { email, password, confirmPassword } = formData;
 
   const schema = {
-    email: Joi.string().required(),
-    //.email(), // remove // for launch
+    email: Joi.string()
+      .required()
+      .email(),
     password: Joi.string()
-      .min(2) // change it back to 6
+      .min(6)
       .max(12)
       .required(),
     confirmPassword: Joi.any()
@@ -81,11 +82,13 @@ const Auth = ({ auth }) => {
   const handleLogin = () => {
     const authData = {
       email,
-      password,
-      authMode
+      password
     };
-    auth(authData);
-    startMainTabs();
+    if (authMode === 'login') {
+      login(authData);
+    } else if (authMode === 'signUp') {
+      register(authData);
+    }
   };
 
   const toggleLogin = () => {
@@ -111,6 +114,10 @@ const Auth = ({ auth }) => {
         </HeadingText>
       </MainText>
     );
+  }
+
+  if (isAuthenticated) {
+    startMainTabs();
   }
 
   return (
@@ -216,7 +223,11 @@ const styles = StyleSheet.create({
   }
 });
 
+const mapStateToProps = state => {
+  return { isAuthenticated: state.auth.isAuthenticated };
+};
+
 export default connect(
-  null,
-  { auth }
+  mapStateToProps,
+  { login, register }
 )(Auth);

@@ -2,6 +2,29 @@ import { Platform } from 'react-native';
 import { Navigation } from 'react-native-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+export const loginPage = () => {
+  Navigation.setRoot({
+    root: {
+      stack: {
+        children: [
+          {
+            component: {
+              name: 'Auth'
+            }
+          }
+        ],
+        options: {
+          topBar: {
+            title: {
+              text: 'Login'
+            }
+          }
+        }
+      }
+    }
+  });
+};
+
 export const startMainTabs = async () => {
   const findIcon = await Icon.getImageSource(
     Platform.OS === 'android' ? 'md-map' : 'ios-map',
@@ -102,7 +125,12 @@ export const startMainTabs = async () => {
   });
 };
 
-export const showPlaceDetails = (placeKey, placeName, placeImage) => {
+export const showPlaceDetails = (
+  placeKey,
+  placeName,
+  placeImage,
+  photoOwner
+) => {
   Navigation.push('FindPlace', {
     component: {
       name: 'PlaceDetail',
@@ -116,7 +144,8 @@ export const showPlaceDetails = (placeKey, placeName, placeImage) => {
       passProps: {
         placeKey,
         placeName,
-        placeImage
+        placeImage,
+        photoOwner
       }
     }
   });

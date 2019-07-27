@@ -9,30 +9,41 @@ import {
   Platform
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+
 import { connect } from 'react-redux';
 import { removePlace } from '../../store/actions';
+
 import { closePlaceDetails } from '../navigations';
 
-const PlaceDetail = ({ removePlace, placeKey, placeName, placeImage }) => (
+const PlaceDetail = ({
+  user,
+  removePlace,
+  placeKey,
+  placeName,
+  placeImage,
+  photoOwner
+}) => (
   <View style={styles.container}>
     <Fragment>
       <Image source={placeImage} style={styles.image} />
       <Text style={styles.text}>{placeName}</Text>
     </Fragment>
     <View>
-      <TouchableOpacity
-        onPress={() => {
-          removePlace(placeKey);
-          closePlaceDetails();
-        }}>
-        <View style={styles.deleteButton}>
-          <Icon
-            size={30}
-            name={Platform.OS === 'android' ? 'md-trash' : 'ios-trash'}
-            color="red"
-          />
-        </View>
-      </TouchableOpacity>
+      {photoOwner === user && (
+        <TouchableOpacity
+          onPress={() => {
+            removePlace(placeKey);
+            closePlaceDetails();
+          }}>
+          <View style={styles.deleteButton}>
+            <Icon
+              size={30}
+              name={Platform.OS === 'android' ? 'md-trash' : 'ios-trash'}
+              color="red"
+            />
+          </View>
+        </TouchableOpacity>
+      )}
       <Button
         title="Close"
         onPress={() => {
@@ -52,7 +63,11 @@ const styles = StyleSheet.create({
   }
 });
 
+const mapStateToProps = state => {
+  return { user: state.auth._id };
+};
+
 export default connect(
-  null,
+  mapStateToProps,
   { removePlace }
 )(PlaceDetail);

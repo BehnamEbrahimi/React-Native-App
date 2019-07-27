@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 
 const placeSchema = new mongoose.Schema({
-  user: {
+  owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },

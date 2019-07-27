@@ -18,7 +18,8 @@ const PlaceList = ({ places }) => (
           showPlaceDetails(
             info.item.key,
             info.item.placeName,
-            info.item.placeImage
+            info.item.placeImage,
+            info.item.owner
           )
         }
       />
